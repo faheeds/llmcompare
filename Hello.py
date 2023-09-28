@@ -3,7 +3,7 @@ import openai
 
 # Initialize the OpenAI API key
 # Replace 'YOUR_OPENAI_API_KEY' with your actual API key.
-openai.api_key = ''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'
+openai.api_key = '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'
 
 def generate_response(prompt, model="gpt-3.5-turbo"):
     """Generate a response from OpenAI based on the given prompt and model."""
