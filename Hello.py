@@ -1,44 +1,55 @@
 import streamlit as st
 import openai
+# Import other necessary libraries for Anthropic Claude and Falcon
 
-# Initialize the OpenAI API key
-# Replace 'YOUR_OPENAI_API_KEY' with your actual API key.
-openai.api_key = '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'
+# Retrieve API Keys from secrets.toml
+OPENAI_API_KEY = st.secrets["openai_key"]
+# ANTHROPIC_CLAUDE_API_KEY = st.secrets["claude_key"]
+# FALCON_API_KEY = st.secrets["falcon_key"]
 
-def generate_response(prompt, model="gpt-3.5-turbo"):
-    """Generate a response from OpenAI based on the given prompt and model."""
+openai.api_key = OPENAI_API_KEY
+
+def query_openai(question):
     response = openai.Completion.create(
-        engine=model,
-        prompt=prompt,
-        max_tokens=150  # Limit to 150 tokens for this example
+      engine="davinci",
+      prompt=question,
+      max_tokens=150
     )
     return response.choices[0].text.strip()
 
+def query_anthropic_claude(question):
+    # Implement the actual API call for Anthropic Claude using ANTHROPIC_CLAUDE_API_KEY
+    # For now, returning a placeholder
+    return "Claude's response to: " + question
+
+def query_falcon(question):
+    # Implement the actual API call for Falcon using FALCON_API_KEY
+    # For now, returning a placeholder
+    return "Falcon's response to: " + question
+
 def main():
-    st.title("LLM Response Comparison")
+    st.title("Question Answering using Multiple APIs")
+    question = st.text_input("Enter your question:")
 
-    # Add prompt
-    prompt = st.text_input("Enter your prompt:")
+    if st.button("Query APIs"):
+        with st.spinner("Fetching responses..."):
+            openai_response = query_openai(question)
+            claude_response = query_anthropic_claude(question)
+            falcon_response = query_falcon(question)
 
-    # Choose models for comparison
-    models = st.multiselect("Select models for comparison", ["gpt-3.0-turbo", "gpt-3.5-turbo", "gpt-4.0-turbo", "anthropic", "falcon", "stability"])
+        col1, col2, col3 = st.columns(3)
 
-    # Generate and display results
-    if st.button("Generate"):
-        for model in models:
-            if model in ["gpt-3.0-turbo", "gpt-3.5-turbo", "gpt-4.0-turbo"]:
-                # This assumes the OpenAI API can handle these model names (this is just for illustration)
-                response = generate_response(prompt, model)
-                st.write(f"{model} Response:")
-                st.write(response)
-            # Add conditions for other LLMs (like Anthropic, Falcon, etc.) here
-            # For example:
-            # elif model == "anthropic":
-            #     response = generate_response_from_anthropic(prompt)
-            #     st.write(f"{model} Response:")
-            #     st.write(response)
-            else:
-                st.write(f"API for {model} not integrated yet.")
+        with col1:
+            st.markdown("**OpenAI's Response**")
+            st.write(openai_response)
+
+        with col2:
+            st.markdown("**Anthropic Claude's Response**")
+            st.write(claude_response)
+
+        with col3:
+            st.markdown("**Falcon's Response**")
+            st.write(falcon_response)
 
 if __name__ == "__main__":
     main()
